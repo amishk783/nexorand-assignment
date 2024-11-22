@@ -3,6 +3,7 @@ import config from "@/config";
 import { Response, NextFunction } from "express";
 import Logger from "@/utils/logger";
 import { AuthenticatedRequest } from "@/types";
+import { AppError } from "@/utils/AppError";
 
 export const verifyUser = (
   req: AuthenticatedRequest,
@@ -10,13 +11,12 @@ export const verifyUser = (
   next: NextFunction
 ) => {
   const authHeader = req.headers["authorization"];
-  console.log("🚀 ~ authHeader:", authHeader);
+
   const token = authHeader && authHeader.split(" ")[1];
   if (!token) {
     Logger.error("No token provided");
-    return res.status(401).send("Unauthorized: No token provided");
+    throw new AppError("Unauthorized: No token provided", 401);
   }
-  console.log("tokenansas", token);
   jwt.verify(
     token,
     config.accessTokenSecret,
@@ -27,15 +27,15 @@ export const verifyUser = (
       console.log(error);
       if (error) {
         Logger.error("Invalid token");
-        return res.status(403).send("Forbidden: Invalid token");
+        throw new AppError("Forbidden: Invalid token", 403);
       }
-      console.log("decoded", decoded);
+
       const { userId } = decoded as JwtPayload;
 
       req.user = userId;
 
       Logger.silly("User authenticated successfully");
-      next();
+      next(error);
     }
   );
 };

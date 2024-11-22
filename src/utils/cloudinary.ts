@@ -8,6 +8,7 @@ import {
 import sharp from "sharp";
 
 import Logger from "./logger";
+import { AppError } from "./AppError";
 const storage = multer.memoryStorage();
 export interface CloudinaryFile extends Express.Multer.File {
   buffer: Buffer;
@@ -17,7 +18,7 @@ export const upload: Multer = multer({ storage: storage });
 export const uploadOnCloudinary = async (file: CloudinaryFile) => {
   try {
     if (!file) {
-      throw new Error("No file provided");
+      throw new AppError("No file provided", 401);
     }
     const processedImage: Buffer = await sharp(file.buffer)
       .toFormat("jpeg")
@@ -32,7 +33,7 @@ export const uploadOnCloudinary = async (file: CloudinaryFile) => {
               if (error) {
                 reject(error);
               } else if (!result) {
-                reject(new Error("Upload failed, result is undefined"));
+                reject(new AppError("Error uploading file", 404));
               } else {
                 resolve(result); // Ensure resolve only receives valid result
               }
@@ -45,6 +46,6 @@ export const uploadOnCloudinary = async (file: CloudinaryFile) => {
     return cloudinaryResponse.secure_url;
   } catch (error) {
     Logger.error("Error uploading file:", error);
-    throw new Error("Error uploading file");
+    throw new AppError("Error uploading file", 403);
   }
 };

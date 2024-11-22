@@ -8,13 +8,13 @@ const classSchema = new Schema({
     trim: true,
   },
 
-  teacerId: { type: Schema.Types.ObjectId, ref: "Teacher", required: true },
+  teacherId: { type: Schema.Types.ObjectId, ref: "Teacher", required: true },
   profileImageUrl: {
     type: String,
     trim: true,
     default: null,
   },
-  studentCount: { type: Schema.Types.ObjectId, default: 0 },
+  studentCount: { type: String, default: 0 },
 
   createdAt: {
     type: Date,

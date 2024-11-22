@@ -1,13 +1,19 @@
 import express from "express";
 import { upload, uploadOnCloudinary } from "@/utils/cloudinary";
-import { createStudent } from "@/controllers/student";
+import {
+  createStudent,
+  deleteStudent,
+  getAllStudent,
+  getStudentById,
+  updateStudent,
+} from "@/controllers/student";
 const router = express.Router();
 
 router.post("/", upload.single("image"), createStudent);
 
-// router.get("/", getAllCards);
-// router.get("/:id", getCardById);
-// router.put("/", updateCard);
-// router.delete("/:id", deleteCard);
+router.get("/", getAllStudent);
+router.get("/:id", getStudentById);
+router.put("/:id", upload.single("image"), updateStudent);
+router.delete("/:id", deleteStudent);
 
 export const studentRouter = router;

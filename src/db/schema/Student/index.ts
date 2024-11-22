@@ -14,7 +14,7 @@ const studentSchema = new Schema({
     trim: true,
     default: null,
   },
-  classID: { type: Schema.Types.ObjectId, ref: "Class", required: true },
+  classId: { type: Schema.Types.ObjectId, ref: "Class", required: true },
 
   createdAt: {
     type: Date,

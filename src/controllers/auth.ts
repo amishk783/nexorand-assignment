@@ -12,9 +12,9 @@ import config from "@/config";
 import Session from "@/db/schema/Session";
 import { z } from "zod";
 
-
 export const register = async (req: Request, res: Response) => {
   try {
+    console.log("🚀 ~ register ~ req:", req.body);
     const validatedData = registerSchema.parse(req.body);
 
     const exisitngUser = await User.findOne({ email: validatedData.email });
@@ -31,15 +31,7 @@ export const register = async (req: Request, res: Response) => {
       hashedPassword,
     });
 
-    const newProfile = new Profile({
-      user_id: newUser._id,
-      name: newUser.username,
-      email: newUser.email,
-    });
-
     const user = await newUser.save();
-
-    await newProfile.save();
 
     const accessToken = jwt.sign(
       { userId: newUser._id },
@@ -53,12 +45,15 @@ export const register = async (req: Request, res: Response) => {
     );
 
     const session = new Session({ userId: newUser._id, refreshToken });
-
+    const mutatedUser = {
+      username: user.username,
+      email: user.email,
+    };
     Logger.silly("User created Successfully");
     res.status(200).json({
       message: "User created successfully",
       session: { refreshToken: session.refreshToken, accessToken: accessToken },
-      user: { ...newProfile._doc },
+      user: mutatedUser,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

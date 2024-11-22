@@ -11,6 +11,8 @@ import { classesRouter } from "./routes/classesRouter";
 import { studentRouter } from "./routes/studentRouter";
 import { main } from "./db";
 import { teacherRouter } from "./routes/teacherRouter";
+import { authRouter } from "./routes/authRouters";
+import { errorHandler } from "./middleware/errorMiddleware";
 
 const app = express();
 
@@ -26,13 +28,13 @@ if (config.nodeEnv !== "test") {
   app.use(morgan(config.nodeEnv === "production" ? "combined" : "dev"));
 }
 
-// app.use(config.apiBasePath);
-
-// app.use("/auth", authRouter);
+app.use("/auth", authRouter);
 app.use("/teacher", teacherRouter);
-app.use("/classes", classesRouter);
+app.use("/classes", verifyUser, classesRouter); //  authorized access
 
 app.use("/student", studentRouter);
+
+app.use(errorHandler); // centralized error approach
 
 app.listen(config.port, () => {
   main().catch((error) => error);
